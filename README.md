@@ -1,46 +1,82 @@
-# Image Classification of Sclerotic and non-sclerotic glomeruli
+# Image Classification of Sclerotic and Non-Sclerotic Glomeruli
 
-The repo contains the research, findings, codebase, traiinng and evaluation of certain models for binary classification of sclerotic and non-sclerotic glomeruli using microscopic images. A short summary of the models trained, these will discussed below:
+## Project Overview
+This repository is dedicated to the development and evaluation of machine learning models for the binary classification of sclerotic and non-sclerotic glomeruli using microscopic images. This complex task is tackled using three different modeling approaches: logistic regression, a custom CNN, and a pretrained ResNet-50. The project not only aims to achieve high accuracy in classification but also to explore the strengths and limitations of each modeling approach in handling medical image data.
 
-|          Model        | Test Set Accuracy |
-|-----------------------|-------------------|
-|   Logistic Regression | 90.5%             |
-|   Simple CNN          | 98.3%             |
-|   ResNet-50           | 99%               |
+## Models Overview
 
-Lets walk though the steps as they were implemented:
+Here is a quick summary of the models and their performances:
 
-### Step 1: (LOGISTIC REGRESSION)
+| Model               | Test Set Accuracy |
+|---------------------|-------------------|
+| Logistic Regression | 90.5%             |
+| Simple CNN          | 98.3%             |
+| ResNet-50           | 99%               |
 
-I started with a linear classification of the images by flattening them and using scikit.learn to fit a logistic regression (LR) model on it. Even though CNNs are the holy grail of image classification problems but I still feel trying to fit a LR model gives a good insight in the data and helps understand it more. The following issues were discovered in doing LR;
+## Files in the Repository
 
-1. The image dataset is not homogenous in size.
-2. The dataset is highly unbalanced. Class0 (non-sclerotic) is very much outnumbered (4704 vs 1054).
-3. The dataset contains .png images which contains additional layer of intensity information which can be a boon or a bain. Boon as it contains extra information to be processed on, bain is my PC hardware has limited capability hence adding extra dimentionality. 
+- **`LinearRegression.ipynb`**: Explores the use of logistic regression for initial model benchmarking.
+- **`CNNClassifier.ipynb`**: Develops a custom CNN tailored to the specific needs of glomeruli image classification.
+- **`resnet50classifier.ipynb`**: Adapts a pretrained ResNet-50 model to the task, leveraging deep learning advancements for improved accuracy.
+- **`evaluation.py`**: Provides utilities for model evaluation and metric calculation.
 
-### Step 2: (Overcome dataset challenges)
+## Detailed Workflow and Model Insights
 
-I. Various methods were tried to homogenise the image size, I tried cropping to a specific size, resizing, crop to the minimum size of image, add padding to the image depending on various parameters. After applying these operation LR accuracy was calculated to determine which method suits the best. 
+### Step 1: Logistic Regression (LinearRegression.ipynb)
 
-II. Images were augmented by adding little variations (i.e. rotaating, fliping, shear..) to augment the cardinality of each class.
+#### Purpose
+To establish a baseline for classification performance using a simple logistic regression model, which helps identify key features and dataset characteristics.
 
-III. The shape of images used for training of LR was 256x256x4
+#### Challenges
+- **Image Size Variability**: The initial dataset contained images of varying sizes, which complicates the creation of a uniform feature set for logistic regression.
+- **Class Imbalance**: A significant imbalance between the classes which can bias the model toward the majority class.
 
-With this I was able to reach an accuracy of 90% with LR (pretty good I'd say, but we still have CNNs). This LR model can be downloaded from [here](). 20% of the data set was split using test_train_split for validation.
+#### Solutions
+- **Image Preprocessing**: Implemented image resizing and padding to standardize the input size for all images.
+- **Rebalancing Techniques**: Applied data augmentation techniques such as image rotations and flips to enhance the dataset's diversity and balance.
 
-### Step 3: (CNN Model)
+#### Results
+The logistic regression model achieved a respectable accuracy of 90.5%, providing valuable insights into the data's characteristics and the feasibility of using simpler models for preliminary analysis.
 
-Due to limited computing power, creating and running a CNN made me find the optimal image size without hammpering much of the accuray, a dataset of dimention (~10000 x 256 x 256 x 4) would simply crach my kernel just on creating and loading this data (m1 mac- 8gb ram). A beefier machine coould have handled it. I hence settled with image dimentions of 128x128x3 and the following was the summary, accuracy and confusion matrix. A batch_normalisation layer felt neccessary here to have a normalization effect on the images accross.
+### Step 2: Custom CNN Model (CNNClassifier.ipynb)
 
-Model can be downloaded from [here]()
+#### Purpose
+To significantly enhance model performance by leveraging a CNN's capability to capture spatial hierarchies in image data.
 
+#### Model Architecture
+- **Layers**: Consists of several convolutional layers, each followed by max pooling. Batch normalization is included to maintain stability and speed up the network's training. The network ends with dense layers for classification.
 
-#### Visualisation of the conv2d layer, and its effect on images
+#### Challenges
+- **Computational Resources**: Initially faced issues with large image sizes overwhelming the available computational resources.
 
-1st Conv layer
+#### Solutions
+- **Optimized Image Size**: Reduced the image dimensions to 128x128 pixels to accommodate the hardware limitations without substantially sacrificing model accuracy.
 
-### Step 4: (Using pretrained model)
-Knowing the capablitites of ResNet50 on image datatset which is part of the residual network family. I tried tweaking it to maximize accuracy. Trained it for 20 epochs, and its metrics are shown below.
+#### Results
+This tailored CNN architecture improved accuracy to 98.3%, validating the effectiveness of convolutional networks in handling image classification tasks, especially with well-preprocessed input data.
 
+### Step 3: Using Pretrained Model - ResNet-50 (resnet50classifier.ipynb)
 
+#### Purpose
+To utilize the powerful, pretrained ResNet-50 model to push the boundaries of accuracy and performance in our classification task.
 
+#### Model Adaptation
+- **Fine-tuning**: Modified the last few layers of the ResNet-50 to better suit our binary classification needs.
+
+#### Challenges
+- **Overfitting**: Managing the model's complexity to prevent overfitting while maintaining high accuracy on unseen data.
+
+#### Solutions
+- **Data Augmentation**: Enhanced the dataset with more diverse image transformations to improve the model's ability to generalize.
+
+#### Results
+Achieved an exceptional accuracy of 99%, demonstrating the potential of using advanced pretrained models in specialized areas such as medical image analysis.
+
+### Evaluation and Metrics (evaluation.py)
+
+#### Functionality
+This script is crucial for assessing the performance of different models. It processes test images, loads the trained models, and predicts outcomes, providing a standardized evaluation framework.
+
+#### Usage
+```bash
+python evaluation.py --test_data_path [path_to_test_data] --model_path [path_to_saved_model]
